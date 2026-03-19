@@ -241,6 +241,53 @@ def delete_campaign(campaign_id):
     return redirect(url_for('campaigns'))
 
 
+# ── Account Settings (username + password) ────────────────────────────────────
+@app.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        action      = request.form.get('action', '')
+        current_pw  = request.form.get('current_password', '')
+        conn        = get_db()
+        row         = conn.execute("SELECT * FROM admins WHERE id=?", (current_user.id,)).fetchone()
+
+        if not check_password_hash(row['password_hash'], current_pw):
+            flash('Current password is incorrect.', 'danger')
+            conn.close()
+        elif action == 'username':
+            new_username = request.form.get('new_username', '').strip()
+            if len(new_username) < 3:
+                flash('Username must be at least 3 characters.', 'danger')
+            elif conn.execute("SELECT id FROM admins WHERE username=? AND id!=?", (new_username, current_user.id)).fetchone():
+                flash('That username is already taken.', 'danger')
+            else:
+                conn.execute("UPDATE admins SET username=? WHERE id=?", (new_username, current_user.id))
+                conn.commit()
+                flash(f'✅ Username changed to "{new_username}".', 'success')
+                conn.close()
+                return redirect(url_for('dashboard'))
+            conn.close()
+        elif action == 'password':
+            new_pw     = request.form.get('new_password', '')
+            confirm_pw = request.form.get('confirm_password', '')
+            if len(new_pw) < 8:
+                flash('New password must be at least 8 characters.', 'danger')
+            elif new_pw != confirm_pw:
+                flash('New passwords do not match.', 'danger')
+            else:
+                conn.execute("UPDATE admins SET password_hash=? WHERE id=?",
+                             (generate_password_hash(new_pw), current_user.id))
+                conn.commit()
+                flash('✅ Password changed successfully!', 'success')
+                conn.close()
+                return redirect(url_for('dashboard'))
+            conn.close()
+        else:
+            conn.close()
+
+    return render_template('change_password.html')
+
+
 # ── CLI Commands ───────────────────────────────────────────────────────────────
 @app.cli.command('init-db')
 def init_db_command():

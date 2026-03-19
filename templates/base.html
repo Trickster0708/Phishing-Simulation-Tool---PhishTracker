@@ -35,6 +35,9 @@
             <a href="{{ url_for('new_campaign') }}" class="nav-item {% if request.endpoint == 'new_campaign' %}active{% endif %}">
                 <span class="nav-icon">➕</span> New Campaign
             </a>
+            <a href="{{ url_for('change_password') }}" class="nav-item {% if request.endpoint == 'change_password' %}active{% endif %}">
+                <span class="nav-icon">🔑</span> Change Password
+            </a>
         </nav>
 
         <div class="sidebar-footer">
