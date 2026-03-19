@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Awareness Training — PhishTracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .awareness-card {
+            max-width: 680px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 50px 56px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+            animation: fadeUp 0.6s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(30px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+        .warning-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+        .main-icon {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        .main-message {
+            font-size: 1.15rem;
+            color: #e2e8f0;
+            margin-bottom: 36px;
+            line-height: 1.7;
+        }
+        .tip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+        .tip-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+        .tip-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+        .tip-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .tip-text { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 32px 0;
+        }
+        .bottom-message {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.7;
+        }
+        .bottom-message strong { color: #94a3b8; }
+        .logo-footer {
+            margin-top: 28px;
+            font-size: 0.8rem;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="awareness-card">
+        <div class="warning-badge">🔔 Security Awareness Training</div>
+
+        <span class="main-icon">🎣</span>
+
+        <h1>This Was a Phishing Simulation!</h1>
+
+        <p class="main-message">
+            You just submitted your credentials to a <strong style="color:#ef4444;">simulated phishing page</strong>.<br>
+            In a real attack, this information would now be in the hands of cybercriminals.<br>
+            <strong style="color:#fbbf24;">Don't worry — this was a controlled awareness exercise.</strong>
+        </p>
+
+        <div class="tip-grid">
+            <div class="tip-card">
+                <span class="tip-icon">🔍</span>
+                <div class="tip-title">Check the URL</div>
+                <div class="tip-text">Always verify the domain before entering credentials. Look for HTTPS and the exact company domain.</div>
+            </div>
+            <div class="tip-card">
+                <span class="tip-icon">📧</span>
+                <div class="tip-title">Be Email Skeptical</div>
+                <div class="tip-text">Urgency and threats ("account suspended") are classic phishing tactics. Slow down and verify.</div>
+            </div>
+            <div class="tip-card">
+                <span class="tip-icon">🔐</span>
+                <div class="tip-title">Use MFA</div>
+                <div class="tip-text">Enable Multi-Factor Authentication on all accounts so a stolen password alone can't grant access.</div>
+            </div>
+            <div class="tip-card">
+                <span class="tip-icon">📞</span>
+                <div class="tip-title">Verify Directly</div>
+                <div class="tip-text">If unsure about an email, call or Slack your IT team directly instead of clicking links.</div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <p class="bottom-message">
+            This simulation was conducted by your organization's <strong>IT Security Team</strong> 
+            using <strong>PhishTracker</strong> — an ethical phishing awareness training platform.<br><br>
+            Your click has been logged anonymously for training analytics. 
+            No real credentials were stored or transmitted outside the organization.
+        </p>
+
+        <div class="logo-footer">
+            🎣 PhishTracker &mdash; Ethical Cybersecurity Awareness Training Platform
+        </div>
+    </div>
+</body>
+</html>

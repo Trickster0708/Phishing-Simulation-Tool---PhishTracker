@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}New Campaign{% endblock %}
+{% block page_title %}➕ Create New Campaign{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="page-heading">New Phishing Campaign</h2>
+        <p class="page-sub">Configure and prepare your simulation campaign</p>
+    </div>
+    <a href="{{ url_for('campaigns') }}" class="btn btn-ghost">← Back to Campaigns</a>
+</div>
+
+<div class="form-card">
+    <div class="security-ribbon">
+        🔒 Education & Awareness Only — Never use against unauthorized targets
+    </div>
+    <form method="POST" class="campaign-form">
+        <div class="form-section">
+            <h3 class="form-section-title">📋 Campaign Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Campaign Name *</label>
+                    <input type="text" name="name" class="form-control" required
+                           placeholder="e.g., Q1 2026 IT Security Drill">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Subject Line *</label>
+                    <input type="text" name="subject" class="form-control" required
+                           placeholder="e.g., Action Required: Verify Your Account">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="form-section-title">📧 Email Template</h3>
+            <div class="form-group">
+                <label class="form-label">Email Body (HTML supported) *</label>
+                <textarea name="template" class="form-control form-textarea" required
+                          placeholder="Enter phishing email body HTML here...&#10;&#10;The system will automatically append a tracking button and your base URL/domain.&#10;&#10;Example:&#10;&lt;p&gt;Dear Employee,&lt;/p&gt;&#10;&lt;p&gt;We have detected a suspicious login to your account. Please click the button below to verify your identity immediately.&lt;/p&gt;&#10;&lt;p&gt;Regards,&lt;br&gt;IT Security Team&lt;/p&gt;"></textarea>
+                <span class="form-hint">💡 A "Click Here to Verify" button with unique tracking link will be automatically added.</span>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="form-section-title">🎯 Target Configuration</h3>
+            <div class="form-group">
+                <label class="form-label">Target Email Addresses *</label>
+                <textarea name="targets" class="form-control form-textarea-sm" required
+                          placeholder="user1@company.com, user2@company.com, user3@company.com"></textarea>
+                <span class="form-hint">💡 Enter comma-separated email addresses of authorized simulation targets.</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">
+                💾 Save Campaign as Draft
+            </button>
+            <a href="{{ url_for('campaigns') }}" class="btn btn-ghost btn-lg">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

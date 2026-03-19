@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Campaigns{% endblock %}
+{% block page_title %}📋 Campaign Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="page-heading">All Campaigns</h2>
+        <p class="page-sub">Manage your phishing simulation campaigns</p>
+    </div>
+    <a href="{{ url_for('new_campaign') }}" class="btn btn-primary">➕ New Campaign</a>
+</div>
+
+{% if campaigns %}
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Campaign Name</th>
+                <th>Status</th>
+                <th>Targets</th>
+                <th>Sent</th>
+                <th>Clicked</th>
+                <th>Creds</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in campaigns %}
+            <tr>
+                <td class="td-id">{{ c.id }}</td>
+                <td class="td-name">{{ c.name }}</td>
+                <td>
+                    <span class="badge badge-{{ c.status }}">
+                        {% if c.status == 'launched' %}🚀 Launched
+                        {% else %}📝 Draft{% endif %}
+                    </span>
+                </td>
+                <td>{{ c.target_emails.split(',')|length }}</td>
+                <td><span class="num-chip">{{ c.sent }}</span></td>
+                <td><span class="num-chip num-warn">{{ c.clicked }}</span></td>
+                <td><span class="num-chip num-danger">{{ c.creds }}</span></td>
+                <td class="td-date">{{ c.created_at[:10] }}</td>
+                <td class="td-actions">
+                    <a href="{{ url_for('campaign_detail', campaign_id=c.id) }}" class="btn btn-sm btn-ghost">View</a>
+                    <form method="POST" action="{{ url_for('delete_campaign', campaign_id=c.id) }}" 
+                          style="display:inline" onsubmit="return confirm('Delete this campaign?')">
+                        <button type="submit" class="btn btn-sm btn-danger-ghost">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No campaigns yet</h3>
+    <p>Create your first phishing simulation campaign to get started.</p>
+    <a href="{{ url_for('new_campaign') }}" class="btn btn-primary">Create Campaign</a>
+</div>
+{% endif %}
+{% endblock %}

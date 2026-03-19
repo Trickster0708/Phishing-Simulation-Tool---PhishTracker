@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }}{% endblock %}
+{% block page_title %}🔍 Campaign Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="page-heading">{{ campaign.name }}</h2>
+        <p class="page-sub">
+            <span class="badge badge-{{ campaign.status }}">
+                {% if campaign.status == 'launched' %}🚀 Launched{% else %}📝 Draft{% endif %}
+            </span>
+            &nbsp; Created: {{ campaign.created_at[:10] }}
+            {% if campaign.launched_at %} &nbsp;|&nbsp; Launched: {{ campaign.launched_at[:10] }} {% endif %}
+        </p>
+    </div>
+    <div class="action-group">
+        {% if campaign.status == 'draft' %}
+        <form method="POST" action="{{ url_for('launch_campaign', campaign_id=campaign.id) }}"
+              onsubmit="return confirm('Launch campaign and send phishing emails now?')">
+            <button type="submit" class="btn btn-primary">🚀 Launch Campaign</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('campaigns') }}" class="btn btn-ghost">← Back</a>
+    </div>
+</div>
+
+<!-- Mini Stats -->
+<div class="mini-stats">
+    <div class="mini-stat">
+        <div class="mini-val">{{ rows|length }}</div>
+        <div class="mini-lbl">Emails Sent</div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-val">{{ rows|selectattr('opened')|list|length }}</div>
+        <div class="mini-lbl">Opened</div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-val">{{ rows|selectattr('clicked')|list|length }}</div>
+        <div class="mini-lbl">Clicked</div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-val">{{ rows|selectattr('cred_submitted')|list|length }}</div>
+        <div class="mini-lbl">Creds Captured</div>
+    </div>
+</div>
+
+<!-- Recipient Tracking Table -->
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">📊 Per-Recipient Tracking</h3>
+    </div>
+    {% if rows %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Recipient</th>
+                <th>Sent</th>
+                <th>Opened</th>
+                <th>Link Clicked</th>
+                <th>Creds Submitted</th>
+                <th>Risk</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td class="td-email">{{ row.email }}</td>
+                <td>
+                    <span class="track-dot dot-green">✅</span>
+                    <span class="track-time">{{ row.sent[:16] if row.sent else '-' }}</span>
+                </td>
+                <td>
+                    {% if row.opened %}
+                        <span class="track-dot dot-blue">👁</span>
+                        <span class="track-time">{{ row.opened[:16] }}</span>
+                    {% else %}
+                        <span class="track-dot dot-gray">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if row.clicked %}
+                        <span class="track-dot dot-yellow">🖱</span>
+                        <span class="track-time">{{ row.clicked[:16] }}</span>
+                    {% else %}
+                        <span class="track-dot dot-gray">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if row.cred_submitted %}
+                        <span class="track-dot dot-red">🔐</span>
+                        <span class="track-time">{{ row.cred_submitted[:16] }}</span>
+                    {% else %}
+                        <span class="track-dot dot-gray">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if row.cred_submitted %}
+                        <span class="risk-badge risk-high">HIGH</span>
+                    {% elif row.clicked %}
+                        <span class="risk-badge risk-med">MEDIUM</span>
+                    {% elif row.opened %}
+                        <span class="risk-badge risk-low">LOW</span>
+                    {% else %}
+                        <span class="risk-badge risk-none">SAFE</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state small">
+        <div class="empty-icon">📭</div>
+        <p>No emails sent yet.
+            {% if campaign.status == 'draft' %}
+                <a href="#" onclick="document.querySelector('form[action*=launch]').submit()">Launch the campaign</a> to start tracking.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Email Template Preview -->
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">📧 Email Template Preview</h3>
+    </div>
+    <div class="template-preview">
+        <div class="template-meta">
+            <strong>Subject:</strong> {{ campaign.email_subject }}<br>
+            <strong>Targets:</strong> {{ campaign.target_emails }}
+        </div>
+        <div class="template-body">{{ campaign.email_template | safe }}</div>
+    </div>
+</div>
+{% endblock %}

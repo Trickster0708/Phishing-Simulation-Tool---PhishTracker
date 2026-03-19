@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}📊 Analytics Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">📧</div>
+        <div class="stat-body">
+            <div class="stat-value">{{ total_sent }}</div>
+            <div class="stat-label">Emails Sent</div>
+        </div>
+        <div class="stat-trend">📨</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0ea5e9);">👁</div>
+        <div class="stat-body">
+            <div class="stat-value">{{ total_opened }}</div>
+            <div class="stat-label">Emails Opened</div>
+        </div>
+        <div class="stat-trend">{{ open_rate }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">🖱</div>
+        <div class="stat-body">
+            <div class="stat-value">{{ total_clicked }}</div>
+            <div class="stat-label">Links Clicked</div>
+        </div>
+        <div class="stat-trend">{{ click_rate }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🔐</div>
+        <div class="stat-body">
+            <div class="stat-value">{{ total_creds }}</div>
+            <div class="stat-label">Creds Captured</div>
+        </div>
+        <div class="stat-trend">{{ cred_rate }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">📋</div>
+        <div class="stat-body">
+            <div class="stat-value">{{ total_campaigns }}</div>
+            <div class="stat-label">Total Campaigns</div>
+        </div>
+        <div class="stat-trend">🏁</div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Campaign Performance</h3>
+            <span class="chart-badge">Bar Chart</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Overall Engagement</h3>
+            <span class="chart-badge">Overview</span>
+        </div>
+        <div class="chart-wrap doughnut-wrap">
+            <canvas id="doughnutChart"></canvas>
+        </div>
+        <div class="donut-legend">
+            <div class="legend-item"><span class="dot dot-sent"></span>Sent</div>
+            <div class="legend-item"><span class="dot dot-opened"></span>Opened</div>
+            <div class="legend-item"><span class="dot dot-clicked"></span>Clicked</div>
+            <div class="legend-item"><span class="dot dot-creds"></span>Credentials</div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Metrics -->
+<div class="metrics-row">
+    <div class="metric-bar-card">
+        <h3 class="section-title">Campaign Success Metrics</h3>
+        <div class="metric-list">
+            <div class="metric-item">
+                <div class="metric-label">Open Rate</div>
+                <div class="metric-bar-wrap">
+                    <div class="metric-bar-fill" style="width: {{ open_rate }}%; background: linear-gradient(90deg,#06b6d4,#0ea5e9)"></div>
+                </div>
+                <div class="metric-pct">{{ open_rate }}%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Click Rate</div>
+                <div class="metric-bar-wrap">
+                    <div class="metric-bar-fill" style="width: {{ click_rate }}%; background: linear-gradient(90deg,#f59e0b,#ef4444)"></div>
+                </div>
+                <div class="metric-pct">{{ click_rate }}%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Credential Submission Rate</div>
+                <div class="metric-bar-wrap">
+                    <div class="metric-bar-fill" style="width: {{ cred_rate }}%; background: linear-gradient(90deg,#ef4444,#dc2626)"></div>
+                </div>
+                <div class="metric-pct">{{ cred_rate }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ chart_labels | tojson }};
+const sent   = {{ chart_sent | tojson }};
+const clicked= {{ chart_clicked | tojson }};
+const creds  = {{ chart_creds | tojson }};
+
+// Bar Chart
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: labels.length ? labels : ['No Campaigns Yet'],
+        datasets: [
+            { label: 'Sent', data: sent.length ? sent : [0], backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 6 },
+            { label: 'Clicked', data: clicked.length ? clicked : [0], backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 6 },
+            { label: 'Creds', data: creds.length ? creds : [0], backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 6 }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#cdd6f4', font: { family: 'Inter' } } } },
+        scales: {
+            x: { ticks: { color: '#9399b2' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#9399b2', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+    }
+});
+
+// Doughnut
+const totalSent = {{ total_sent }};
+const totalOpened = {{ total_opened }};
+const totalClicked = {{ total_clicked }};
+const totalCreds = {{ total_creds }};
+new Chart(document.getElementById('doughnutChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Sent', 'Opened', 'Clicked', 'Credentials'],
+        datasets: [{
+            data: [totalSent || 1, totalOpened, totalClicked, totalCreds],
+            backgroundColor: ['#6366f1','#06b6d4','#f59e0b','#ef4444'],
+            borderWidth: 2,
+            borderColor: '#1e1e2e'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
+{% endblock %}
