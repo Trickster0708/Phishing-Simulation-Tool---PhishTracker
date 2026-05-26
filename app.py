@@ -17,10 +17,11 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-please-change')
 
 # Ensure database and tables exist on startup (handles production/WSGI imports)
-if not os.path.exists(DB_PATH):
+try:
     init_db()
     conn = get_db()
-    exists = conn.execute("SELECT id FROM admins WHERE username='admin'").fetchone()
+    # Check if any admin account exists (so we don't overwrite user edits)
+    exists = conn.execute("SELECT id FROM admins LIMIT 1").fetchone()
     if not exists:
         conn.execute(
             "INSERT INTO admins (username, password_hash) VALUES (?,?)",
@@ -28,6 +29,8 @@ if not os.path.exists(DB_PATH):
         )
         conn.commit()
     conn.close()
+except Exception as e:
+    print(f"[-] Database initialization failed: {e}", file=sys.stderr)
 
 # ── Login Manager ──────────────────────────────────────────────────────────────
 login_manager = LoginManager()
