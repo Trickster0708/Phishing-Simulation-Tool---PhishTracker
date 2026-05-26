@@ -101,6 +101,31 @@ Visit: **http://127.0.0.1:5000**
 
 ---
 
+## Vercel & Neon (PostgreSQL) Production Deployment
+
+PhishTracker supports seamless production deployment on **Vercel** with a cloud **PostgreSQL** database (such as **Neon** or **Supabase**) to ensure database persistence in serverless environments.
+
+### 1. Set Up Neon PostgreSQL
+1. Sign up for a free PostgreSQL database at [neon.tech](https://neon.tech).
+2. Copy your PostgreSQL connection string (looks like `postgresql://user:pass@host/db?sslmode=require`).
+
+### 2. Configure Vercel Environment Variables
+Add the following Environment Variables in your Vercel Project Settings under **Settings ➔ Environment Variables**:
+
+| Environment Key | Description |
+|-----------------|-------------|
+| `DATABASE_URL` | *Your copied Neon connection string* |
+| `SECRET_KEY` | *A long random security string* |
+| `MAIL_SERVER` | *e.g. sandbox.smtp.mailtrap.io* |
+| `MAIL_PORT` | *e.g. 2525* |
+| `MAIL_USERNAME` | *Your SMTP username* |
+| `MAIL_PASSWORD` | *Your SMTP password* |
+| `MAIL_FROM` | *e.g. phishsim@yourcompany.com* |
+
+When Vercel starts, it will automatically connect to your Neon database, initialize all the tables, and seed the default admin account (`admin` / `admin123`). All data remains stateful and never resets.
+
+---
+
 ## Using the Platform
 
 ### Create an Admin (CLI)
