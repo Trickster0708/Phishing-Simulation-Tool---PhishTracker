@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from datetime import datetime
 
-from database import get_db, init_db
+from database import get_db, init_db, DB_PATH
 from tracker import tracker_bp
 from email_sender import send_campaign_emails
 
@@ -15,6 +15,19 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-please-change')
+
+# Ensure database and tables exist on startup (handles production/WSGI imports)
+if not os.path.exists(DB_PATH):
+    init_db()
+    conn = get_db()
+    exists = conn.execute("SELECT id FROM admins WHERE username='admin'").fetchone()
+    if not exists:
+        conn.execute(
+            "INSERT INTO admins (username, password_hash) VALUES (?,?)",
+            ('admin', generate_password_hash('admin123'))
+        )
+        conn.commit()
+    conn.close()
 
 # ── Login Manager ──────────────────────────────────────────────────────────────
 login_manager = LoginManager()
@@ -315,18 +328,4 @@ def create_admin(username, password):
 
 
 if __name__ == '__main__':
-    if not os.path.exists('phishsim.db'):
-        init_db()
-        # Create default admin on first run
-        conn = get_db()
-        exists = conn.execute("SELECT id FROM admins WHERE username='admin'").fetchone()
-        if not exists:
-            conn.execute(
-                "INSERT INTO admins (username, password_hash) VALUES (?,?)",
-                ('admin', generate_password_hash('admin123'))
-            )
-            conn.commit()
-            print("[+] Default admin created: admin / admin123  (change this immediately!)")
-        conn.close()
-
     app.run(debug=True, host='0.0.0.0', port=5000)
