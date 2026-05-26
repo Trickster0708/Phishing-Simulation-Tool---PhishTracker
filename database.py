@@ -1,7 +1,22 @@
 import sqlite3
 import os
+import shutil
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'phishsim.db')
+# Vercel and other serverless environments have a read-only filesystem, except for /tmp.
+# We dynamically detect if the current directory is read-only or if we are running under Vercel,
+# and route the DB path to /tmp/phishsim.db if needed.
+_base_dir = os.path.dirname(__file__)
+if os.environ.get('VERCEL') == '1' or not os.access(_base_dir, os.W_OK):
+    DB_PATH = '/tmp/phishsim.db'
+    # Copy the packaged DB from the repo to /tmp on startup so seed data / accounts aren't lost
+    repo_db = os.path.join(_base_dir, 'phishsim.db')
+    if os.path.exists(repo_db) and not os.path.exists(DB_PATH):
+        try:
+            shutil.copy(repo_db, DB_PATH)
+        except Exception as e:
+            print(f"[-] Failed to copy DB to /tmp: {e}")
+else:
+    DB_PATH = os.path.join(_base_dir, 'phishsim.db')
 
 
 def get_db():
