@@ -151,7 +151,11 @@ def campaigns():
         sent = conn.execute("SELECT COUNT(*) FROM email_logs WHERE campaign_id=?", (row['id'],)).fetchone()[0]
         clicked = conn.execute("SELECT COUNT(*) FROM click_logs WHERE campaign_id=?", (row['id'],)).fetchone()[0]
         creds = conn.execute("SELECT COUNT(*) FROM captured_credentials WHERE campaign_id=?", (row['id'],)).fetchone()[0]
-        campaign_stats.append({**dict(row), 'sent': sent, 'clicked': clicked, 'creds': creds})
+        row_dict = dict(row)
+        # Stringify datetime fields so templates can safely slice them (PostgreSQL returns datetime objects)
+        row_dict['created_at'] = str(row_dict['created_at']) if row_dict.get('created_at') else ''
+        row_dict['launched_at'] = str(row_dict['launched_at']) if row_dict.get('launched_at') else None
+        campaign_stats.append({**row_dict, 'sent': sent, 'clicked': clicked, 'creds': creds})
     conn.close()
     return render_template('campaigns.html', campaigns=campaign_stats)
 
@@ -192,6 +196,12 @@ def campaign_detail(campaign_id):
         flash('Campaign not found.', 'danger')
         return redirect(url_for('campaigns'))
 
+    # Convert to dict so we can safely stringify datetime fields
+    # (psycopg2 returns datetime objects; SQLite returns strings)
+    campaign = dict(campaign)
+    campaign['created_at'] = str(campaign['created_at']) if campaign.get('created_at') else ''
+    campaign['launched_at'] = str(campaign['launched_at']) if campaign.get('launched_at') else None
+
     email_logs = conn.execute(
         "SELECT * FROM email_logs WHERE campaign_id=? ORDER BY sent_at DESC",
         (campaign_id,)
@@ -209,10 +219,10 @@ def campaign_detail(campaign_id):
         ).fetchone()
         detail_rows.append({
             'email': log['recipient_email'],
-            'sent': log['sent_at'],
-            'opened': log['opened_at'],
-            'clicked': clicked['clicked_at'] if clicked else None,
-            'cred_submitted': cred['submitted_at'] if cred else None,
+            'sent': str(log['sent_at']) if log['sent_at'] else None,
+            'opened': str(log['opened_at']) if log['opened_at'] else None,
+            'clicked': str(clicked['clicked_at']) if clicked and clicked['clicked_at'] else None,
+            'cred_submitted': str(cred['submitted_at']) if cred and cred['submitted_at'] else None,
         })
 
     conn.close()
