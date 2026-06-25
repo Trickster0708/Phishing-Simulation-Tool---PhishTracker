@@ -267,6 +267,72 @@ def delete_campaign(campaign_id):
     return redirect(url_for('campaigns'))
 
 
+@app.route('/campaigns/<int:campaign_id>/export')
+@login_required
+def export_campaign_csv(campaign_id):
+    """Export per-recipient tracking data for a campaign as a CSV file."""
+    import csv
+    import io
+    from flask import Response
+
+    conn = get_db()
+    campaign = conn.execute("SELECT * FROM campaigns WHERE id=?", (campaign_id,)).fetchone()
+    if not campaign:
+        conn.close()
+        flash('Campaign not found.', 'danger')
+        return redirect(url_for('campaigns'))
+
+    email_logs = conn.execute(
+        "SELECT * FROM email_logs WHERE campaign_id=? ORDER BY sent_at DESC",
+        (campaign_id,)
+    ).fetchall()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Recipient Email', 'Sent At', 'Opened At', 'Link Clicked At',
+                     'Credentials Submitted At', 'Risk Level'])
+
+    for log in email_logs:
+        clicked = conn.execute(
+            "SELECT clicked_at FROM click_logs WHERE tracking_token=? LIMIT 1",
+            (log['tracking_token'],)
+        ).fetchone()
+        cred = conn.execute(
+            "SELECT submitted_at FROM captured_credentials WHERE tracking_token=? LIMIT 1",
+            (log['tracking_token'],)
+        ).fetchone()
+
+        clicked_at = str(clicked['clicked_at']) if clicked else ''
+        cred_at    = str(cred['submitted_at']) if cred else ''
+
+        if cred_at:
+            risk = 'HIGH'
+        elif clicked_at:
+            risk = 'MEDIUM'
+        elif log['opened_at']:
+            risk = 'LOW'
+        else:
+            risk = 'SAFE'
+
+        writer.writerow([
+            log['recipient_email'],
+            str(log['sent_at']) if log['sent_at'] else '',
+            str(log['opened_at']) if log['opened_at'] else '',
+            clicked_at,
+            cred_at,
+            risk
+        ])
+
+    conn.close()
+    output.seek(0)
+    filename = f"campaign_{campaign_id}_report.csv"
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
+
+
 # ── Account Settings (username + password) ────────────────────────────────────
 @app.route('/change-password', methods=['GET', 'POST'])
 @login_required

@@ -11,12 +11,13 @@ PhishTracker is a full-stack ethical phishing simulation platform built for secu
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
+|-------|-----------| 
 | Backend | Python Flask |
-| Database | SQLite |
+| Database | SQLite (local) / PostgreSQL (production) |
 | Frontend | HTML5, Vanilla CSS, JavaScript |
 | Charts | Chart.js |
 | Email | SMTP / Mailtrap |
+| Deployment | Vercel + Neon PostgreSQL |
 
 ---
 
